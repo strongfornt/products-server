@@ -32,6 +32,7 @@ async function run() {
     //     const result = await productsCollection.find()
     //     res.send(result)
     // })
+    const h = 'hi'
 
     // app.post('/products',async(req,res)=>{
     //     const product ={
