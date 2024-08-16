@@ -32,6 +32,10 @@ async function run() {
         const result = await productsCollection.find().toArray() 
         res.send(result)
     })
+    app.get("/productsCount",async(req,res) => {
+        const totalProduct = await productsCollection.countDocuments()
+        res.send({totalProduct})
+    })
     
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
