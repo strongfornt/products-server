@@ -28,6 +28,7 @@ async function run() {
 
     app.get("/products", async (req, res) => {
       const { name, category, brand, sortBy } = req.query || "";
+        
       let query = {};
       let sortCriteria = {};
 
