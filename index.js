@@ -27,70 +27,88 @@ async function run() {
     const productsCollection = db.collection("products");
 
     app.get("/products", async (req, res) => {
-      const { name, category, brand, sortBy } = req.query || "";
-        
-      let query = {};
+      const { name, category, brand, sortBy, minPrice, maxPrice } =
+        req.query || "";
+
+     
       let sortCriteria = {};
 
-    // search and filtering logic start from here =============================
-    if (name || category || brand) {
-        query = {
-          $or: [],
-        };
+      // search and filtering logic start from here =============================
+      let query = {  };
 
-        if (name) {
-          query.$or.push({ name: { $regex: name, $options: "i" } });
-        }
-        if (category) {
-          query.$or.push({ category: { $regex: category, $options: "i" } });
-        }
-        if (brand) {
-          query.$or.push({ brand: { $regex: brand, $options: "i" } });
-        }
+      // Search by name
+      if (name) {
+          query.name ={ $regex: name, $options: "i" } ;
       }
-    // search and filtering logic start from here =============================
+  
+      // Search by category
+      if (category) {
+          query.category ={ $regex: category, $options: "i" } ;
+      }
+      // Search by brand
+      if (brand) {
+          query.brand ={ $regex: brand, $options: "i" } ;
+      }
+  console.log(minPrice);
+    //Search by min price ==
+    if(minPrice){
+        query.price = {$gte: parseFloat(minPrice)}
+    }
+    //Search by max price ==
+    if(maxPrice){
+        query.price = {$lte: parseFloat(maxPrice)}
+    }
+   
+      // search and filtering logic start from here =============================
 
-    //   sorting logic start here===================================
-    if (sortBy === "price-asc") {
+      //   sorting logic start here===================================
+      if (sortBy === "price-asc") {
         sortCriteria = { price: 1 }; // Sort by price, ascending
       } else if (sortBy === "price-desc") {
         sortCriteria = { price: -1 }; // Sort by price, descending
       } else if (sortBy === "date-desc") {
         sortCriteria = { createdAt: -1 }; // Sort by date, newest first
       }
-    //   sorting logic end here=======================
+      //   sorting logic end here=======================
 
       const size = parseInt(req.query.size);
       const page = parseInt(req.query.page) - 1;
       const result = await productsCollection
-        .find(query).sort(sortCriteria)
+        .find(query)
+        .sort(sortCriteria)
         .skip(page * size)
         .limit(size)
         .toArray();
       res.send(result);
     });
     app.get("/productsCount", async (req, res) => {
-      const { name, category, brand } = req.query || "";
+      const { name, category, brand, minPrice, maxPrice } = req.query || "";
 
-      let query = {};
-     
+      
+    let query = {  };
 
-      if (name || category || brand) {
-        query = {
-          $or: [],
-        };
+    // Search by name
+    if (name) {
+        query.name ={ $regex: name, $options: "i" } ;
+    }
 
-        if (name) {
-          query.$or.push({ name: { $regex: name, $options: "i" } });
-        }
-        if (category) {
-          query.$or.push({ category: { $regex: category, $options: "i" } });
-        }
-        if (brand) {
-          query.$or.push({ brand: { $regex: brand, $options: "i" } });
-        }
-      }
-    
+    // Search by category
+    if (category) {
+        query.category ={ $regex: category, $options: "i" } ;
+    }
+    // Search by brand
+    if (brand) {
+        query.brand ={ $regex: brand, $options: "i" } ;
+    }
+
+   //Search by min price ==
+   if(minPrice){
+    query.price = {$gte: parseFloat(minPrice)}
+}
+//Search by max price ==
+if(maxPrice){
+    query.price = {$lte: parseFloat(maxPrice)}
+}
 
       const totalProduct = await productsCollection.countDocuments(query);
       res.send({ totalProduct });
