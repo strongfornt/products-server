@@ -27,10 +27,12 @@ async function run() {
     const productsCollection = db.collection("products");
 
     app.get("/products", async (req, res) => {
-      const { name, category, brand } = req.query || "";
+      const { name, category, brand, sortBy } = req.query || "";
       let query = {};
+      let sortCriteria = {};
 
-      if (name || category || brand) {
+    // search and filtering logic start from here =============================
+    if (name || category || brand) {
         query = {
           $or: [],
         };
@@ -45,11 +47,22 @@ async function run() {
           query.$or.push({ brand: { $regex: brand, $options: "i" } });
         }
       }
+    // search and filtering logic start from here =============================
+
+    //   sorting logic start here===================================
+    if (sortBy === "price-asc") {
+        sortCriteria = { price: 1 }; // Sort by price, ascending
+      } else if (sortBy === "price-desc") {
+        sortCriteria = { price: -1 }; // Sort by price, descending
+      } else if (sortBy === "date-desc") {
+        sortCriteria = { createdAt: -1 }; // Sort by date, newest first
+      }
+    //   sorting logic end here=======================
 
       const size = parseInt(req.query.size);
       const page = parseInt(req.query.page) - 1;
       const result = await productsCollection
-        .find(query)
+        .find(query).sort(sortCriteria)
         .skip(page * size)
         .limit(size)
         .toArray();
@@ -57,7 +70,9 @@ async function run() {
     });
     app.get("/productsCount", async (req, res) => {
       const { name, category, brand } = req.query || "";
+
       let query = {};
+     
 
       if (name || category || brand) {
         query = {
@@ -74,6 +89,7 @@ async function run() {
           query.$or.push({ brand: { $regex: brand, $options: "i" } });
         }
       }
+    
 
       const totalProduct = await productsCollection.countDocuments(query);
       res.send({ totalProduct });
