@@ -30,35 +30,33 @@ async function run() {
       const { name, category, brand, sortBy, minPrice, maxPrice } =
         req.query || "";
 
-     
       let sortCriteria = {};
 
       // search and filtering logic start from here =============================
-      let query = {  };
+      let query = {};
 
       // Search by name
       if (name) {
-          query.name ={ $regex: name, $options: "i" } ;
+        query.name = { $regex: name, $options: "i" };
       }
-  
+
       // Search by category
       if (category) {
-          query.category ={ $regex: category, $options: "i" } ;
+        query.category = { $regex: category, $options: "i" };
       }
       // Search by brand
       if (brand) {
-          query.brand ={ $regex: brand, $options: "i" } ;
+        query.brand = { $regex: brand, $options: "i" };
       }
-  console.log(minPrice);
-    //Search by min price ==
-    if(minPrice){
-        query.price = {$gte: parseFloat(minPrice)}
-    }
-    //Search by max price ==
-    if(maxPrice){
-        query.price = {$lte: parseFloat(maxPrice)}
-    }
-   
+      //Search by min price ==
+      if (minPrice) {
+        query.price = { $gte: parseFloat(minPrice) };
+      }
+      //Search by max price ==
+      if (maxPrice) {
+        query.price = { $lte: parseFloat(maxPrice) };
+      }
+
       // search and filtering logic start from here =============================
 
       //   sorting logic start here===================================
@@ -81,34 +79,35 @@ async function run() {
         .toArray();
       res.send(result);
     });
+
     app.get("/productsCount", async (req, res) => {
       const { name, category, brand, minPrice, maxPrice } = req.query || "";
 
-      
-    let query = {  };
+    // search and filtering logic start from here =============================
+    let query = {};
 
     // Search by name
     if (name) {
-        query.name ={ $regex: name, $options: "i" } ;
+      query.name = { $regex: name, $options: "i" };
     }
 
     // Search by category
     if (category) {
-        query.category ={ $regex: category, $options: "i" } ;
+      query.category = { $regex: category, $options: "i" };
     }
     // Search by brand
     if (brand) {
-        query.brand ={ $regex: brand, $options: "i" } ;
+      query.brand = { $regex: brand, $options: "i" };
+    }
+    //Search by min price ==
+    if (minPrice) {
+      query.price = { $gte: parseFloat(minPrice) };
+    }
+    //Search by max price ==
+    if (maxPrice) {
+      query.price = { $lte: parseFloat(maxPrice) };
     }
 
-   //Search by min price ==
-   if(minPrice){
-    query.price = {$gte: parseFloat(minPrice)}
-}
-//Search by max price ==
-if(maxPrice){
-    query.price = {$lte: parseFloat(maxPrice)}
-}
 
       const totalProduct = await productsCollection.countDocuments(query);
       res.send({ totalProduct });
